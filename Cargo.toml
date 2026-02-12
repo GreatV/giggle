@@ -2,7 +2,7 @@
 name = "giggle"
 version = "0.1.0"
 edition = "2024"
-description = "Audio analysis and music information retrieval library (Rust port of librosa)"
+description = "Audio and Music Analysis Library (Rust port of librosa)"
 license = "Apache-2.0"
 authors = ["Wang Xin <xinwang614@gmail.com>"]
 repository = "https://github.com/greatv/giggle"

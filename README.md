@@ -1,6 +1,6 @@
 # Giggle
 
-Audio analysis and music information retrieval library for Rust.
+Audio and Music Analysis Library for Rust.
 
 ## Acknowledgments
 
