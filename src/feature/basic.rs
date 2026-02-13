@@ -5,7 +5,7 @@ use ndarray::Array2;
 ///
 /// The zero-crossing rate is the rate at which a signal changes from
 /// positive to negative or back. This feature is heavily used in speech
-/// recognition and music information retrieval.
+/// recognition and music analysis.
 ///
 /// # Arguments
 /// * `y` - Input audio signal

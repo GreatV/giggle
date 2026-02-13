@@ -316,7 +316,7 @@ pub fn salience(
 /// // Assume constant f0 of 440 Hz
 /// let f0: Vec<f32> = vec![440.0; n_frames];
 /// let harmonics: Vec<f32> = (1..=12).map(|i| i as f32).collect();
-/// let f0_harm = f0_harmonics(&mag, &f0, &freqs, &harmonics, InterpKind::Linear, 0.0);
+/// let f0_harm = f0_harmonics(&mag, &f0, &freqs, &harmonics, InterpKind::Linear, 0.0).unwrap();
 /// assert_eq!(f0_harm.shape()[0], 12); // 12 harmonics
 /// assert_eq!(f0_harm.shape()[1], n_frames);
 /// ```
@@ -327,17 +327,27 @@ pub fn f0_harmonics(
     harmonics: &[f32],
     kind: InterpKind,
     fill_value: f32,
-) -> Array2<f32> {
+) -> crate::Result<Array2<f32>> {
     let n_freq = x.shape()[0];
     let n_frames = x.shape()[1];
     let n_harmonics = harmonics.len();
 
-    if n_freq == 0 || n_frames == 0 || n_harmonics == 0 || freqs.len() != n_freq {
-        return Array2::zeros((n_harmonics, n_frames));
+    if n_freq == 0 || n_frames == 0 || n_harmonics == 0 {
+        return Ok(Array2::zeros((n_harmonics, n_frames)));
+    }
+
+    if freqs.len() != n_freq {
+        return Err(crate::Error::ShapeMismatch {
+            expected: format!("freqs.len() == {} (n_freq)", n_freq),
+            got: format!("freqs.len() == {}", freqs.len()),
+        });
     }
 
     if f0.len() != n_frames {
-        return Array2::zeros((n_harmonics, n_frames));
+        return Err(crate::Error::ShapeMismatch {
+            expected: format!("f0.len() == {} (n_frames)", n_frames),
+            got: format!("f0.len() == {}", f0.len()),
+        });
     }
 
     let mut result = Array2::<f32>::zeros((n_harmonics, n_frames));
@@ -369,7 +379,7 @@ pub fn f0_harmonics(
         }
     }
 
-    result
+    Ok(result)
 }
 
 #[cfg(test)]
@@ -640,7 +650,7 @@ mod tests {
         let f0: Vec<f32> = vec![440.0; n_frames];
         let harmonics: Vec<f32> = (1..=12).map(|i| i as f32).collect();
 
-        let f0_harm = f0_harmonics(&mag, &f0, &freqs, &harmonics, InterpKind::Linear, 0.0);
+        let f0_harm = f0_harmonics(&mag, &f0, &freqs, &harmonics, InterpKind::Linear, 0.0).unwrap();
 
         assert_eq!(f0_harm.shape()[0], 12);
         assert_eq!(f0_harm.shape()[1], n_frames);
@@ -668,7 +678,7 @@ mod tests {
         let f0: Vec<f32> = vec![440.0; n_frames];
         let harmonics = vec![1.0, 2.0, 3.0];
 
-        let f0_harm = f0_harmonics(&mag, &f0, &freqs, &harmonics, InterpKind::Linear, 0.0);
+        let f0_harm = f0_harmonics(&mag, &f0, &freqs, &harmonics, InterpKind::Linear, 0.0).unwrap();
 
         // First harmonic (at f0=440) should have high energy
         let mid_frame = n_frames / 2;
@@ -687,7 +697,8 @@ mod tests {
         let f0 = vec![100.0, f32::NAN, 100.0, -1.0, 100.0];
         let harmonics = vec![1.0, 2.0];
 
-        let f0_harm = f0_harmonics(&x, &f0, &freqs, &harmonics, InterpKind::Linear, -999.0);
+        let f0_harm =
+            f0_harmonics(&x, &f0, &freqs, &harmonics, InterpKind::Linear, -999.0).unwrap();
 
         // Frames with NaN or invalid f0 should have fill_value
         assert_eq!(f0_harm[(0, 1)], -999.0);
@@ -703,7 +714,7 @@ mod tests {
         let f0: Vec<f32> = vec![];
         let harmonics = vec![1.0, 2.0];
 
-        let f0_harm = f0_harmonics(&x, &f0, &freqs, &harmonics, InterpKind::Linear, 0.0);
+        let f0_harm = f0_harmonics(&x, &f0, &freqs, &harmonics, InterpKind::Linear, 0.0).unwrap();
 
         assert_eq!(f0_harm.shape(), &[2, 0]);
     }
@@ -735,7 +746,7 @@ mod tests {
             .collect();
         let harmonics = vec![1.0, 2.0];
 
-        let f0_harm = f0_harmonics(&mag, &f0, &freqs, &harmonics, InterpKind::Linear, 0.0);
+        let f0_harm = f0_harmonics(&mag, &f0, &freqs, &harmonics, InterpKind::Linear, 0.0).unwrap();
 
         assert_eq!(f0_harm.shape()[0], 2);
         assert_eq!(f0_harm.shape()[1], n_frames);

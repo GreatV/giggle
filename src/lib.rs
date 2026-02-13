@@ -1,4 +1,4 @@
-//! Audio analysis and music information retrieval library for Rust.
+//! Audio and music analysis library for Rust.
 //!
 //! Giggle is a comprehensive audio analysis library providing feature parity
 //! with Python's [librosa](https://librosa.org/). It covers the full pipeline

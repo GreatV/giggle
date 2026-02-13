@@ -145,7 +145,8 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         &f0_harmonics,
         InterpKind::Linear,
         0.0,
-    );
+    )
+    .unwrap();
 
     info!("f0-harmonic shape: {:?}", f0_harm.shape());
     info!("  - {} harmonics", f0_harm.shape()[0]);
