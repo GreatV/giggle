@@ -108,6 +108,17 @@ fn compute_frame(
     buffer
 }
 
+/// Compute the Short-Time Fourier Transform (STFT).
+///
+/// # Arguments
+/// * `y` - Input audio signal
+/// * `config` - STFT configuration (FFT size, hop length, window, etc.)
+///
+/// # Returns
+/// Complex STFT matrix of shape (n_freq, n_frames) where n_freq = n_fft/2 + 1
+///
+/// # Errors
+/// Returns an error if the audio is invalid or if n_fft/hop_length is zero.
 pub fn stft(y: &[f32], config: &StftConfig) -> crate::Result<Array2<Complex32>> {
     crate::utils::valid_audio(y)?;
     if config.n_fft == 0 {
@@ -183,6 +194,21 @@ pub fn stft(y: &[f32], config: &StftConfig) -> crate::Result<Array2<Complex32>> 
     Ok(stft_matrix)
 }
 
+/// Compute the Inverse Short-Time Fourier Transform (ISTFT).
+///
+/// Reconstructs a time-domain signal from its STFT representation using
+/// overlap-add synthesis.
+///
+/// # Arguments
+/// * `stft_matrix` - Complex STFT matrix (n_freq x n_frames)
+/// * `config` - STFT configuration (must match the forward STFT)
+/// * `length` - Optional output signal length (truncates if provided)
+///
+/// # Returns
+/// Reconstructed time-domain signal
+///
+/// # Errors
+/// Returns an error if the STFT matrix is empty.
 pub fn istft(
     stft_matrix: &Array2<Complex32>,
     config: &StftConfig,
@@ -250,6 +276,14 @@ pub fn istft(
     Ok(out)
 }
 
+/// Separate a complex STFT matrix into magnitude and phase.
+///
+/// # Arguments
+/// * `stft_matrix` - Complex STFT matrix
+///
+/// # Returns
+/// Tuple of (magnitude, phase) where magnitude is real-valued and
+/// phase is unit-magnitude complex values.
 pub fn magphase(stft_matrix: &Array2<Complex32>) -> (Array2<f32>, Array2<Complex32>) {
     let shape = stft_matrix.raw_dim();
     let mut magnitude = Array2::<f32>::zeros(shape);

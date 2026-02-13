@@ -1,3 +1,13 @@
+/// Compute a periodic Hann (raised cosine) window.
+///
+/// The Hann window is one of the most commonly used windows in spectral
+/// analysis. It has good frequency resolution and moderate spectral leakage.
+///
+/// # Arguments
+/// * `n` - Window length
+///
+/// # Returns
+/// Hann window of length `n`
 pub fn hann(n: usize) -> Vec<f32> {
     if n == 0 {
         return Vec::new();
@@ -11,6 +21,16 @@ pub fn hann(n: usize) -> Vec<f32> {
         .collect()
 }
 
+/// Compute a Hamming window.
+///
+/// The Hamming window is similar to the Hann window but with slightly
+/// different coefficients that reduce the first side lobe level.
+///
+/// # Arguments
+/// * `n` - Window length
+///
+/// # Returns
+/// Hamming window of length `n`
 pub fn hamming(n: usize) -> Vec<f32> {
     if n == 0 {
         return Vec::new();
@@ -24,6 +44,16 @@ pub fn hamming(n: usize) -> Vec<f32> {
         .collect()
 }
 
+/// Compute a Blackman window.
+///
+/// The Blackman window provides better side lobe suppression than Hann
+/// or Hamming windows, at the cost of wider main lobe.
+///
+/// # Arguments
+/// * `n` - Window length
+///
+/// # Returns
+/// Blackman window of length `n`
 pub fn blackman(n: usize) -> Vec<f32> {
     if n == 0 {
         return Vec::new();
@@ -40,6 +70,16 @@ pub fn blackman(n: usize) -> Vec<f32> {
         .collect()
 }
 
+/// Compute a Bartlett (triangular) window.
+///
+/// The Bartlett window is a triangular window that tapers linearly
+/// from zero at the edges to a peak in the center.
+///
+/// # Arguments
+/// * `n` - Window length
+///
+/// # Returns
+/// Bartlett window of length `n`
 pub fn bartlett(n: usize) -> Vec<f32> {
     if n == 0 {
         return Vec::new();
@@ -124,20 +164,6 @@ pub fn get_window_from_str(name: &str, n: usize) -> Option<Vec<f32>> {
     WindowType::parse(name).map(|wtype| get_window(wtype, n))
 }
 
-/// Compute the sum of squared window values for overlap-add processing.
-/// This is used to check if the NOLA (nonzero overlap-add) constraint is satisfied,
-/// which is necessary for perfect STFT/ISTFT reconstruction.
-///
-/// # Arguments
-/// * `window` - The window function values
-/// * `n_frames` - Number of frames
-/// * `hop_length` - Number of samples between frames
-/// * `win_length` - Length of the window (if None, uses window.len())
-/// * `n_fft` - FFT size (if None, uses window.len())
-///
-/// # Returns
-/// An array of length (n_frames - 1) * hop_length + win_length showing the
-/// sum of squared window values at each position.
 /// Build a two-dimensional diagonal filter kernel.
 ///
 /// This is primarily used for smoothing recurrence or self-similarity matrices.
